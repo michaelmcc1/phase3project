@@ -6,6 +6,7 @@ const collectionName = "customers"
 const connectString = baseUrl + "/" + dbName; 
 let collection;
 
+//connects to mongoDB
 async function dbStartup() {
     const client = new MongoClient(connectString);
     await client.connect();
@@ -29,13 +30,11 @@ async function getCustomers() {
     }
 }
 
-
 // Reset database for testing purposes  
 async function resetCustomers() {
-    let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj", "x-api-key": "abcde"},
-    { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena" ,"API_KEY":"abcde"},
-    { "id": 2, "name": "Scott Ramsey", "email": "scottr@abc.com", "password": "scottr", "API_KEY":"abcde"}];
-
+    let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj" },
+    { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena"  },
+    { "id": 2, "name": "Scott Ramsey", "email": "scottr@abc.com", "password": "scottr" }];
     try {
         await collection.deleteMany({});
         await collection.insertMany(data);
@@ -75,23 +74,7 @@ async function getCustomerById(id) {
         return [null, err.message];
     }
 }
-
-
-// // update existing customer
-// async function updateCustomer(updatedCustomer) {
-//     try {
-//         const filter = { "id": updatedCustomer.id };
-//         const setData = { $set: updatedCustomer };
-//     if (updateResult.modifiedCount === 1) {
-//             return ["one record updated", null]; // Success message
-//         } else {
-//             return [null, "No record was updated"]; // Error message
-//         }
-//     } catch (err) {
-//         console.error("Error updating customer:", err);
-//         return [null, err.message]; // Return error message
-//     }
-// }
+ 
 
 // update existing customer with updated code
 async function updateCustomer(id, updatedCustomer) {
@@ -120,7 +103,7 @@ async function updateCustomer(id, updatedCustomer) {
     }
 }
 
-
+// Delete customer
 async function deleteCustomerById(id) {
     try {
         const deleteResult = await collection.deleteOne({ "id": +id });

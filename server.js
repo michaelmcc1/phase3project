@@ -1,30 +1,51 @@
 const express = require('express');
 const path = require('path');  // for handling file paths
 const da = require("./data-access");
-const bodyParser = require('body-parser');
-// const apiKey = process.env.API_KEY;
+const bodyParser = require('body-parser'); 
 const apiKeyMiddleware = require('./components/api_auth/api_key'); //for middleware API detection and key
-
-
+const yargs = require('yargs');
 const app = express();
 const port = process.env.PORT || 4000;  // use env var or default to 4000
 
 
-
 // Set the static directory to serve files from
 app.use(express.static(path.join(__dirname, 'public')));
-
 app.use(bodyParser.json());
-
 app.use(apiKeyMiddleware);
+ 
 
+// Parse command line arguments
+const argv = yargs
+    .options({
+        'apiKey': {
+            alias: 'k',
+            description: 'API key for authentication',
+            type: 'string'
+        }
+    })
+    .help()
+    .argv;
+    console.log('Command line arguments:', argv);
+// Retrieve the API key from the command line arguments
+const apiKeyFromCommandLine = argv.apiKey;
+
+// If API key is provided via command line, use it; otherwise, fallback to environment variable
+const apiKey = apiKeyFromCommandLine || process.env.API_KEY;
+
+// Check if API key is provided
+if (!apiKey) {
+    console.error('API key is missing. Please provide an API key via command line or environment variable.');
+    process.exit(1); // Exit the application with an error code
+}
+console.log('API key:', apiKey);
 
 
 // Get all customers
-app.get("customers", apiKeyMiddleware, async (req, res) => {
+app.get("/customers", apiKeyMiddleware, async (req, res) => {
     const cust = await da.getCustomers();
     res.send(cust); 
    });
+
 
 
 // Error handeling
@@ -37,7 +58,7 @@ app.get("/customers", async (req, res) => {
         res.send(err);
     }   
 });
-
+ 
 
 // Reset Database
 app.get("/reset", async (req, res) => {
@@ -50,29 +71,8 @@ app.get("/reset", async (req, res) => {
     }   
 });
 
-
-// Adds customers
-// app.post('/customers', async (req, res) => {
-//     const newCustomer = req.body;
-//     if (newCustomer === null || req.body != {}) {
-//         res.status(400);
-//         res.send("missing request body");
-//     } else {
-//         // return array format [status, id, errMessage]
-//         const [status, id, errMessage] = await da.addCustomer(newCustomer);
-//         if (status === "success") {
-//             res.status(201);
-//             let response = { ...newCustomer };
-//             response["_id"] = id;
-//             res.send(response);
-//         } else {
-//             res.status(400);
-//             res.send(errMessage);
-//         }
-//     }
-// });
-
-// Adds customers with updated code
+ 
+// Adds customers 
 app.post('/customers', async (req, res) => {
     const newCustomer = req.body;
     // Check if the request body is missing
@@ -95,6 +95,7 @@ app.post('/customers', async (req, res) => {
 });
 
 
+
 // Look for customer by ID
 app.get("/customers/:id", apiKeyMiddleware, async (req, res) => {
     const id = req.params.id;
@@ -108,28 +109,8 @@ app.get("/customers/:id", apiKeyMiddleware, async (req, res) => {
     }   
 });
 
-
-// Updates existing customer
-// app.put('/customers/:id', async (req, res) => {
-//     const id = req.params.id;
-//     const updatedCustomer = req.body;
-//     if (updatedCustomer === null || req.body != {}) {
-//         res.status(400);
-//         res.send("missing request body");
-//     } else {
-//         delete updatedCustomer._id;
-//         // return array format [message, errMessage]
-//         const [message, errMessage] = await da.updateCustomer(updatedCustomer);
-//         if (message) {
-//             res.send(message);
-//         } else {
-//             res.status(400);
-//             res.send(errMessage);
-//         }
-//     }
-// });
-
-// Updates existing customer with updated code
+ 
+// Updates existing customer  
 app.put('/customers/:id', async (req, res) => {
     const id = req.params.id;
     const updatedCustomer = req.body;
@@ -152,7 +133,6 @@ app.put('/customers/:id', async (req, res) => {
         res.status(400).send(errMessage);
     }
 });
-
 
 
 // Delete customer
