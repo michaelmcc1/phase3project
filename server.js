@@ -1,8 +1,9 @@
-
+require('dotenv').config(); // grabs .env to pull the API KEY
 const express = require('express');
 const path = require('path');  // for handling file paths
 const da = require("./data-access");
 const bodyParser = require('body-parser');
+const apiKey = process.env.API_KEY;
 
 const app = express();
 const port = process.env.PORT || 4000;  // use env var or default to 4000
@@ -14,8 +15,42 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(bodyParser.json());
 
+
+
+
+
+// Define the middleware function
+const apiKeyMiddleware = (req, res, next) => {
+    
+    // Retrieve the API key from the request header
+    const apiKey = req.headers['x-api-key'];
+
+    // Retrieve the expected API key from the environment variable
+    const expectedApiKey = process.env.API_KEY;
+
+    // Check if the API key is missing
+    if (!apiKey) {
+        // Send a 401 Unauthorized response if the API key is missing
+        return res.status(401).send('API Key is missing');
+    }
+
+    // Check if the API key matches the expected value
+    if (apiKey !== expectedApiKey) {
+        // Send a 403 Forbidden response if the API key is invalid
+        return res.status(403).send('API Key is invalid');
+    }
+
+    // Call the next middleware or endpoint handler
+    next();
+};
+
+
+app.use(apiKeyMiddleware);
+
+
+
 // Get all customers
-app.get("/customers", async (req, res) => {
+app.get("customers", apiKeyMiddleware, async (req, res) => {
     const cust = await da.getCustomers();
     res.send(cust); 
    });

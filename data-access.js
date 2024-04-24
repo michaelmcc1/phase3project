@@ -32,9 +32,9 @@ async function getCustomers() {
 
 // Reset database for testing purposes  
 async function resetCustomers() {
-    let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj" },
-    { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena" },
-    { "id": 2, "name": "Scott Ramsey", "email": "scottr@abc.com", "password": "scottr" }];
+    let data = [{ "id": 0, "name": "Mary Jackson", "email": "maryj@abc.com", "password": "maryj", "x-api-key": "abcde"},
+    { "id": 1, "name": "Karen Addams", "email": "karena@abc.com", "password": "karena" ,"API_KEY":"abcde"},
+    { "id": 2, "name": "Scott Ramsey", "email": "scottr@abc.com", "password": "scottr", "API_KEY":"abcde"}];
 
     try {
         await collection.deleteMany({});
