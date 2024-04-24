@@ -66,6 +66,7 @@ app.get("/reset", async (req, res) => {
 //     }
 // });
 
+// Addes customers with updated code
 app.post('/customers', async (req, res) => {
     const newCustomer = req.body;
     // Check if the request body is missing
@@ -122,16 +123,16 @@ app.get("/customers/:id", async (req, res) => {
 //     }
 // });
 
+// Updates existing customer with updated code
 app.put('/customers/:id', async (req, res) => {
     const id = req.params.id;
     const updatedCustomer = req.body;
-    
+
     // Check if the request body is missing
     if (Object.keys(req.body).length === 0) {
         res.status(400).send("missing request body");
         return; // Return early to avoid executing the rest of the code
     }
-
     // Handle the request
     delete updatedCustomer._id; // Remove the _id field if present
 
@@ -145,6 +146,22 @@ app.put('/customers/:id', async (req, res) => {
         res.status(400).send(errMessage);
     }
 });
+
+
+
+// Delete customer
+app.delete("/customers/:id", async (req, res) => {
+    const id = req.params.id;
+    // return array [message, errMessage]
+    const [message, errMessage] = await da.deleteCustomerById(id);
+    if (message) {
+        res.send(message);
+    } else {
+        res.status(404);
+        res.send(errMessage);
+    }
+});
+
 
 app.listen(port, () => {
   console.log(`Server listening on port ${port}`);
