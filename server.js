@@ -77,7 +77,6 @@ app.post('/customers', async (req, res) => {
             res.status(400).send("missing required properties");
             return;
         }
-
         // Handle the request
         const [status, id, errMessage] = await da.addCustomer(newCustomer);
         if (status === "success") {
@@ -100,6 +99,51 @@ app.get("/customers/:id", async (req, res) => {
         res.status(404);
         res.send(err);
     }   
+});
+
+
+// Updates existing customer
+// app.put('/customers/:id', async (req, res) => {
+//     const id = req.params.id;
+//     const updatedCustomer = req.body;
+//     if (updatedCustomer === null || req.body != {}) {
+//         res.status(400);
+//         res.send("missing request body");
+//     } else {
+//         delete updatedCustomer._id;
+//         // return array format [message, errMessage]
+//         const [message, errMessage] = await da.updateCustomer(updatedCustomer);
+//         if (message) {
+//             res.send(message);
+//         } else {
+//             res.status(400);
+//             res.send(errMessage);
+//         }
+//     }
+// });
+
+app.put('/customers/:id', async (req, res) => {
+    const id = req.params.id;
+    const updatedCustomer = req.body;
+    
+    // Check if the request body is missing
+    if (Object.keys(req.body).length === 0) {
+        res.status(400).send("missing request body");
+        return; // Return early to avoid executing the rest of the code
+    }
+
+    // Handle the request
+    delete updatedCustomer._id; // Remove the _id field if present
+
+    // Update the customer in the database
+    const [message, errMessage] = await da.updateCustomer(id, updatedCustomer);
+
+    // Send the appropriate response
+    if (message) {
+        res.send(message);
+    } else {
+        res.status(400).send(errMessage);
+    }
 });
 
 app.listen(port, () => {

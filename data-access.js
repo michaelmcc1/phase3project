@@ -77,6 +77,50 @@ async function getCustomerById(id) {
 }
 
 
+// // update existing customer
+// async function updateCustomer(updatedCustomer) {
+//     try {
+//         const filter = { "id": updatedCustomer.id };
+//         const setData = { $set: updatedCustomer };
+//     if (updateResult.modifiedCount === 1) {
+//             return ["one record updated", null]; // Success message
+//         } else {
+//             return [null, "No record was updated"]; // Error message
+//         }
+//     } catch (err) {
+//         console.error("Error updating customer:", err);
+//         return [null, err.message]; // Return error message
+//     }
+// }
+
+// update existing customer with updated code
+async function updateCustomer(id, updatedCustomer) {
+    console.log("Updating customer with ID:", id);
+    try {
+        // used to convert the id to a number
+        const customerId = parseInt(id);
+        const filter = { "id": customerId };
+ 
+        console.log("Update filter:", filter);
+        const setData = { $set: updatedCustomer };
+        console.log("Update data",setData)
+        
+        // Update the customer in the database
+        const updateResult = await collection.updateOne(filter, setData);
+        console.log("Update result:", updateResult);
+        // Check if the update operation was successful
+        if (updateResult.modifiedCount === 1) {
+            return ["one record updated", null]; // Success message
+        } else {
+            return [null, "No record was updated"]; // Error message
+        }
+    } catch (err) {
+        console.error("Error updating customer:", err);
+        return [null, err.message]; // Return error message
+    }
+}
+
+
 
 dbStartup();
-module.exports = { getCustomers, resetCustomers, addCustomer, getCustomerById };
+module.exports = { getCustomers, resetCustomers, addCustomer, getCustomerById, updateCustomer };
