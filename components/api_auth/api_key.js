@@ -1,5 +1,3 @@
-// apiKeyMiddleware.js
-
 //looks for API KEY in .env
 require('dotenv').config();
 
@@ -28,7 +26,6 @@ const apiKeyMiddleware = (req, res, next) => {
 
     // Call the next middleware or endpoint handler
     next();
-
 };    
 
 // Export the middleware function
